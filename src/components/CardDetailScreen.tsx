@@ -31,6 +31,8 @@ interface CardDetailScreenProps {
   baseLocation?: string | null;
   userCoords?: { latitude: number; longitude: number } | null;
   fallbackRegion?: FallbackRegion;
+  // Copies already in the cart, keyed by `${cardId}:${storeId}`
+  cartQuantities?: Record<string, number>;
 }
 
 export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
@@ -41,6 +43,7 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
   baseLocation,
   userCoords,
   fallbackRegion,
+  cartQuantities = {},
 }) => {
   const [storeSortBy, setStoreSortBy] = useState<SortStoreOption>('distance');
   const [selectedStoreNotice, setSelectedStoreNotice] = useState<string | null>(null);
@@ -571,23 +574,38 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
                       <span>Hold</span>
                     </button>
 
-                    <button
-                      id={`store-add-cart-btn-${store.storeId}`}
-                      onClick={() => {
-                        if (onAddToCart) {
-                          onAddToCart(card, store);
-                          setSelectedStoreNotice(
-                            `Added 1x ${card.name} from ${store.storeName} ($${store.price.toFixed(
-                              2
-                            )}) to your shopping cart!`
-                          );
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition flex items-center gap-1 shadow-sm active:scale-95"
-                    >
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      <span>Add to Cart</span>
-                    </button>
+                    {(() => {
+                      const inCart = cartQuantities[`${card.id}:${store.storeId}`] || 0;
+                      const allInCart = inCart >= store.quantity;
+                      return (
+                        <button
+                          id={`store-add-cart-btn-${store.storeId}`}
+                          onClick={() => {
+                            if (allInCart) {
+                              // The cart already holds all of this store's stock: add nothing, go to the cart
+                              onNavigateCart?.();
+                              return;
+                            }
+                            if (onAddToCart) {
+                              onAddToCart(card, store);
+                              setSelectedStoreNotice(
+                                `Added 1x ${card.name} from ${store.storeName} ($${store.price.toFixed(
+                                  2
+                                )}) to your shopping cart!`
+                              );
+                            }
+                          }}
+                          className={
+                            allInCart
+                              ? 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold transition flex items-center gap-1 border border-amber-500/60 active:scale-95'
+                              : 'px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition flex items-center gap-1 shadow-sm active:scale-95'
+                          }
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                          <span>{allInCart ? `All ${store.quantity} in cart · View cart` : 'Add to Cart'}</span>
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               </article>

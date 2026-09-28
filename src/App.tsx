@@ -287,6 +287,9 @@ export default function App() {
             baseLocation={baseLocation}
             userCoords={userCoords}
             fallbackRegion={fallbackRegion}
+            cartQuantities={Object.fromEntries(
+              cartItems.map((item) => [`${item.cardId}:${item.storeId}`, item.quantity])
+            )}
           />
         ) : (
           <HomeScreen
