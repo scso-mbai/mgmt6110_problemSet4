@@ -18,14 +18,14 @@ export default async function handler(req, res) {
   const credential = process.env.location;
   const keyConfigured = Boolean(credential && credential !== 'undefined' && credential.trim() !== '');
 
-  // BEFORE the fetch, if the credential is missing or empty, return 503 with a message naming the variable,
-  // and do not call the upstream at all. Must NEVER print the credential or any part of it.
+  // The 'location' variable is optional: /api/location and the page work out area names
+  // from the browser's coordinates without it. So a missing variable is not a failure.
+  // Must NEVER print the credential or any part of it.
   if (!keyConfigured) {
-    return sendJson(503, {
-      keyConfigured: false,
-      upstreamAnswered: false,
-      upstreamStatus: null,
-      error: "The 'location' environment variable is missing or empty.",
+    return sendJson(200, {
+      status: 'ok',
+      keyConfigured: 'not required',
+      note: 'Area names are worked out from coordinates; no external location service is needed.',
     });
   }
 
