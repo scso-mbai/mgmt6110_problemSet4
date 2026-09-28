@@ -40,6 +40,8 @@ export const CartScreen: React.FC<CartScreenProps> = ({
   onSelectCard,
 }) => {
   const [checkoutCompleted, setCheckoutCompleted] = useState(false);
+  // Clear Cart asks once before emptying the cart
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   // Group cart items by storeId
   const itemsByStore: Record<string, StoreGroup> = {};
@@ -124,16 +126,38 @@ export const CartScreen: React.FC<CartScreenProps> = ({
           <span>Back to Singles</span>
         </button>
 
-        {cartItems.length > 0 && (
-          <button
-            id="clear-cart-btn"
-            onClick={onClearCart}
-            className="text-xs text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-950/40 border border-rose-900/60 hover:bg-rose-950/70 transition"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear Cart</span>
-          </button>
-        )}
+        {cartItems.length > 0 &&
+          (confirmingClear ? (
+            <div id="clear-cart-confirm" className="flex items-center gap-1.5 text-xs">
+              <span className="text-slate-300 font-medium">Clear all items?</span>
+              <button
+                id="clear-cart-yes-btn"
+                onClick={() => {
+                  setConfirmingClear(false);
+                  onClearCart();
+                }}
+                className="text-rose-300 hover:text-rose-200 font-semibold px-2.5 py-1.5 rounded-lg bg-rose-950/60 border border-rose-800/80 hover:bg-rose-900/60 transition"
+              >
+                Yes, clear
+              </button>
+              <button
+                id="clear-cart-cancel-btn"
+                onClick={() => setConfirmingClear(false)}
+                className="text-slate-200 hover:text-white font-semibold px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              id="clear-cart-btn"
+              onClick={() => setConfirmingClear(true)}
+              className="text-xs text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-950/40 border border-rose-900/60 hover:bg-rose-950/70 transition"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Clear Cart</span>
+            </button>
+          ))}
       </div>
 
       {/* Screen Title */}
