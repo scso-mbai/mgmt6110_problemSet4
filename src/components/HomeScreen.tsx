@@ -103,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ cards, onSelectCard }) =
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 bg-amber-950/40 border border-amber-800/60 rounded-xl px-3 py-2 w-fit">
             <Store className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Click any card image to compare local store prices & distances</span>
+            <span>Open any card to compare prices, stock and distances across local stores</span>
           </div>
         </div>
       </section>
@@ -333,12 +333,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ cards, onSelectCard }) =
                 #{card.cardNumber}
               </div>
 
-              {/* Click prompt overlay on hover / tap */}
-              <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                <span className="bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
-                  Compare Stores <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
             </div>
 
             {/* Card Meta & Stats Body */}
