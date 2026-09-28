@@ -231,11 +231,14 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
             <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/40 p-4 rounded-xl">
               <div>
                 <span className="text-xs font-medium text-slate-400 block uppercase tracking-wider">
-                  TCG Market Benchmark
+                  Benchmark price
                 </span>
                 <div className="text-3xl font-black text-amber-400 leading-tight">
                   ${card.marketPrice.toFixed(2)}
                 </div>
+                <p id="benchmark-explanation" className="text-xs text-slate-400 mt-1 max-w-sm">
+                  A fixed reference price set for this card in our sample catalogue. Store prices are compared against it; it is not an average of these stores.
+                </p>
               </div>
 
               <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1">
@@ -475,14 +478,14 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
                       <div className="text-[10px] font-semibold">
                         {priceDifference < 0 ? (
                           <span className="text-emerald-400">
-                            -${Math.abs(priceDifference).toFixed(2)} vs mkt
+                            -${Math.abs(priceDifference).toFixed(2)} vs benchmark
                           </span>
                         ) : priceDifference > 0 ? (
                           <span className="text-rose-400">
-                            +${priceDifference.toFixed(2)} vs mkt
+                            +${priceDifference.toFixed(2)} vs benchmark
                           </span>
                         ) : (
-                          <span className="text-slate-400">At market avg</span>
+                          <span className="text-slate-400">At benchmark</span>
                         )}
                       </div>
                     </div>

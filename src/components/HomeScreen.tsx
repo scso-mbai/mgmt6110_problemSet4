@@ -395,7 +395,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ cards, onSelectCard }) =
               <div className="pt-3 border-t border-slate-800 flex items-end justify-between gap-2 mt-2">
                 <div>
                   <span className="block text-[11px] font-medium uppercase tracking-wider text-slate-400">
-                    Current Market Price
+                    Benchmark price
                   </span>
                   <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-tight leading-tight">
                     ${card.marketPrice.toFixed(2)}
