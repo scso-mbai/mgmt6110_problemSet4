@@ -27,6 +27,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   baseSentence,
   onRetryLocation,
 }) => {
+  // Location blocked: the app falls back to City Hall, so say that calmly, once.
+  const isBlocked = baseStatus === 'refused';
+  const blockedSentence = 'Location is off, so distances are measured from City Hall.';
+
   return (
     <header className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white transition-colors">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
@@ -73,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div
             id="user-base-indicator"
             className="flex items-center gap-1.5 text-xs text-slate-300 bg-slate-800/90 border border-slate-700/80 rounded-full py-1.5 px-2.5 sm:px-3 whitespace-nowrap shadow-inner"
-            title={baseStatus === 'success' && baseLocation ? `Your Base: ${baseLocation}` : baseSentence}
+            title={baseStatus === 'success' && baseLocation ? `Your Base: ${baseLocation}` : isBlocked ? blockedSentence : baseSentence}
           >
             <MapPin
               className={`w-3.5 h-3.5 shrink-0 ${
@@ -81,6 +85,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ? 'text-emerald-400'
                   : baseStatus === 'loading'
                   ? 'text-amber-400'
+                  : isBlocked
+                  ? 'text-slate-400'
                   : 'text-rose-400'
               }`}
             />
@@ -92,10 +98,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ? 'text-slate-200'
                   : baseStatus === 'loading'
                   ? 'text-amber-300'
+                  : isBlocked
+                  ? 'text-slate-300'
                   : 'text-rose-300'
               }`}
             >
-              {baseStatus === 'success' && baseLocation ? baseLocation : baseSentence}
+              {baseStatus === 'success' && baseLocation ? baseLocation : isBlocked ? 'City Hall' : baseSentence}
             </span>
           </div>
 
@@ -138,9 +146,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           id="location-status-banner"
           className="bg-slate-950/95 border-t border-slate-800/90 px-4 py-1.5 text-xs text-center flex items-center justify-center gap-2"
         >
-          <span className="font-semibold text-slate-400">Your Base Status:</span>
+          {!isBlocked && <span className="font-semibold text-slate-400">Your Base Status:</span>}
           <span id="base-status-sentence" className="text-slate-200">
-            {baseSentence}
+            {isBlocked ? blockedSentence : baseSentence}
           </span>
           {onRetryLocation && baseStatus !== 'loading' && (
             <button
