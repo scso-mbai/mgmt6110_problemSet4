@@ -6,7 +6,7 @@ import { CardDetailScreen } from './components/CardDetailScreen';
 import { CartScreen } from './components/CartScreen';
 import { StoreLocatorModal } from './components/StoreLocatorModal';
 import { CartItem, TradingCard, CardStoreInventory, BaseLocationStatus } from './types';
-import { findNearestSingaporeArea } from './utils/geo';
+import { findNearestSingaporeArea, FALLBACK_REGIONS } from './utils/geo';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'detail' | 'cart'>('home');
@@ -16,6 +16,10 @@ export default function App() {
   // User coordinates from browser's Geolocation API
   const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isStoreLocatorOpen, setIsStoreLocatorOpen] = useState(false);
+
+  // Region chosen by the visitor when browser location is off (Central / City Hall by default)
+  const [fallbackRegionId, setFallbackRegionId] = useState<string>('central');
+  const fallbackRegion = FALLBACK_REGIONS.find((r) => r.id === fallbackRegionId) || FALLBACK_REGIONS[0];
 
   // Live location states: loading, empty, refused, unreachable, success
   const [baseLocation, setBaseLocation] = useState<string | null>(null);
@@ -259,6 +263,8 @@ export default function App() {
         baseStatus={baseStatus}
         baseSentence={baseSentence}
         onRetryLocation={fetchBaseLocation}
+        fallbackRegionId={fallbackRegion.id}
+        onChangeFallbackRegion={setFallbackRegionId}
       />
 
       {/* Main Content Area: Screen 1, Screen 2, or Screen 3 */}
@@ -280,6 +286,7 @@ export default function App() {
             onNavigateCart={handleNavigateCart}
             baseLocation={baseLocation}
             userCoords={userCoords}
+            fallbackRegion={fallbackRegion}
           />
         ) : (
           <HomeScreen
@@ -295,6 +302,7 @@ export default function App() {
         onClose={() => setIsStoreLocatorOpen(false)}
         userCoords={userCoords}
         baseLocationName={baseLocation}
+        fallbackRegion={fallbackRegion}
       />
 
       {/* Footer with context reminder */}

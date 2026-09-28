@@ -14,6 +14,22 @@ export const DEFAULT_SINGAPORE_COORDS: Coordinates = {
   longitude: 103.8520,
 };
 
+// Regions a visitor can choose when browser location is off.
+// Each has one reference point, so "Nearest" is never ambiguous.
+export interface FallbackRegion extends Coordinates {
+  id: string;
+  label: string; // shown in the dropdown
+  place: string; // the reference point's own name
+}
+
+export const FALLBACK_REGIONS: FallbackRegion[] = [
+  { id: 'central', label: 'Central (City Hall)', place: 'City Hall', ...DEFAULT_SINGAPORE_COORDS },
+  { id: 'north', label: 'North (Woodlands)', place: 'Woodlands', latitude: 1.4369, longitude: 103.7865 },
+  { id: 'north-east', label: 'North-East (Serangoon)', place: 'Serangoon', latitude: 1.3496, longitude: 103.8737 },
+  { id: 'east', label: 'East (Tampines)', place: 'Tampines', latitude: 1.3533, longitude: 103.9453 },
+  { id: 'west', label: 'West (Jurong East)', place: 'Jurong East', latitude: 1.3331, longitude: 103.7422 },
+];
+
 /**
  * Calculates the straight-line distance between two sets of coordinates using the Haversine formula.
  *

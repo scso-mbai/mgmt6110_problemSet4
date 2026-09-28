@@ -16,13 +16,14 @@ import {
   Compass,
 } from 'lucide-react';
 import { HOBBY_STORES_DIRECTORY } from '../data';
-import { calculateHaversineDistanceKm, formatStoreDistance, DEFAULT_SINGAPORE_COORDS } from '../utils/geo';
+import { calculateHaversineDistanceKm, formatStoreDistance, DEFAULT_SINGAPORE_COORDS, FallbackRegion } from '../utils/geo';
 
 interface StoreLocatorModalProps {
   isOpen: boolean;
   onClose: () => void;
   userCoords: { latitude: number; longitude: number } | null;
   baseLocationName?: string | null;
+  fallbackRegion?: FallbackRegion;
 }
 
 export const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({
@@ -30,12 +31,13 @@ export const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({
   onClose,
   userCoords,
   baseLocationName,
+  fallbackRegion,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>('All');
 
   // Active coordinates: browser geolocation coords or Singapore Central reference
-  const activeCoords = userCoords || DEFAULT_SINGAPORE_COORDS;
+  const activeCoords = userCoords || fallbackRegion || DEFAULT_SINGAPORE_COORDS;
   const isLiveGps = !!userCoords;
 
   // Compute live Haversine distances for all hobby stores
@@ -110,6 +112,8 @@ export const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({
                 <strong className="text-slate-200">
                   {isLiveGps
                     ? `${baseLocationName || 'Live GPS'} (${activeCoords.latitude.toFixed(4)}, ${activeCoords.longitude.toFixed(4)})`
+                    : fallbackRegion
+                    ? `${fallbackRegion.label} Reference`
                     : 'City Hall Reference (Central Singapore)'}
                 </strong>
               </span>

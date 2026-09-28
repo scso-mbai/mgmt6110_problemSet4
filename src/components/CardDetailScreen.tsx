@@ -21,7 +21,7 @@ import {
 import { TradingCard, CardStoreInventory, SortStoreOption } from '../types';
 import { CardArt } from './CardArt';
 import { USER_CURRENT_LOCATION } from '../data';
-import { calculateHaversineDistanceKm, formatStoreDistance, DEFAULT_SINGAPORE_COORDS } from '../utils/geo';
+import { calculateHaversineDistanceKm, formatStoreDistance, DEFAULT_SINGAPORE_COORDS, FallbackRegion } from '../utils/geo';
 
 interface CardDetailScreenProps {
   card: TradingCard;
@@ -30,6 +30,7 @@ interface CardDetailScreenProps {
   onNavigateCart?: () => void;
   baseLocation?: string | null;
   userCoords?: { latitude: number; longitude: number } | null;
+  fallbackRegion?: FallbackRegion;
 }
 
 export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
@@ -39,12 +40,14 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
   onNavigateCart,
   baseLocation,
   userCoords,
+  fallbackRegion,
 }) => {
   const [storeSortBy, setStoreSortBy] = useState<SortStoreOption>('distance');
   const [selectedStoreNotice, setSelectedStoreNotice] = useState<string | null>(null);
 
   // Active coordinates: browser geolocation or Singapore central reference point
-  const activeCoords = userCoords || DEFAULT_SINGAPORE_COORDS;
+  const activeCoords = userCoords || fallbackRegion || DEFAULT_SINGAPORE_COORDS;
+  const fallbackPlace = fallbackRegion?.place || 'City Hall';
   const isLiveGps = !!userCoords;
 
   // Recalculate distanceKm using Haversine formula from user's live coordinates
@@ -292,7 +295,7 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
                 <span>
                   Distances measured from your reference point:{' '}
                   <strong className="text-slate-100">
-                    {baseLocation ? `${baseLocation}, Singapore` : USER_CURRENT_LOCATION}
+                    {baseLocation ? `${baseLocation}, Singapore` : fallbackRegion ? `${fallbackRegion.label}, Singapore` : USER_CURRENT_LOCATION}
                   </strong>
                 </span>
               </p>
@@ -445,7 +448,7 @@ export const CardDetailScreen: React.FC<CardDetailScreenProps> = ({
                         </span>
                       </div>
                       <span className="text-[10px] text-slate-500 block">
-                        {isLiveGps ? 'from your location' : 'from City Hall'}
+                        {isLiveGps ? 'from your location' : `from ${fallbackPlace}`}
                       </span>
                     </div>
 

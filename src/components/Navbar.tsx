@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Sparkles, ShoppingCart, Compass } from 'lucide-react';
 import { BaseLocationStatus } from '../types';
+import { FALLBACK_REGIONS } from '../utils/geo';
 
 interface NavbarProps {
   currentScreen: 'home' | 'detail' | 'cart';
@@ -13,6 +14,8 @@ interface NavbarProps {
   baseStatus: BaseLocationStatus;
   baseSentence: string;
   onRetryLocation?: () => void;
+  fallbackRegionId?: string;
+  onChangeFallbackRegion?: (regionId: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -26,10 +29,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   baseStatus,
   baseSentence,
   onRetryLocation,
+  fallbackRegionId = 'central',
+  onChangeFallbackRegion,
 }) => {
   // Location blocked: the app falls back to City Hall, so say that calmly, once.
   const isBlocked = baseStatus === 'refused';
-  const blockedSentence = 'Location is off, so distances are measured from City Hall.';
+  const fallbackRegion = FALLBACK_REGIONS.find((r) => r.id === fallbackRegionId) || FALLBACK_REGIONS[0];
+  const blockedSentence = `Location is off. Distances from: ${fallbackRegion.label}`;
 
   return (
     <header className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white transition-colors">
@@ -103,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'text-rose-300'
               }`}
             >
-              {baseStatus === 'success' && baseLocation ? baseLocation : isBlocked ? 'City Hall' : baseSentence}
+              {baseStatus === 'success' && baseLocation ? baseLocation : isBlocked ? fallbackRegion.place : baseSentence}
             </span>
           </div>
 
@@ -147,9 +153,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="bg-slate-950/95 border-t border-slate-800/90 px-4 py-1.5 text-xs text-center flex items-center justify-center gap-2"
         >
           {!isBlocked && <span className="font-semibold text-slate-400">Your Base Status:</span>}
-          <span id="base-status-sentence" className="text-slate-200">
-            {isBlocked ? blockedSentence : baseSentence}
-          </span>
+          {isBlocked ? (
+            <span id="base-status-sentence" className="text-slate-200 flex items-center gap-1.5">
+              <label htmlFor="fallback-region-select">Location is off. Distances from:</label>
+              <select
+                id="fallback-region-select"
+                value={fallbackRegion.id}
+                onChange={(e) => onChangeFallbackRegion?.(e.target.value)}
+                className="bg-slate-800 border border-slate-600 text-slate-100 rounded-md px-1.5 py-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                {FALLBACK_REGIONS.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            </span>
+          ) : (
+            <span id="base-status-sentence" className="text-slate-200">
+              {baseSentence}
+            </span>
+          )}
           {onRetryLocation && baseStatus !== 'loading' && (
             <button
               onClick={onRetryLocation}
